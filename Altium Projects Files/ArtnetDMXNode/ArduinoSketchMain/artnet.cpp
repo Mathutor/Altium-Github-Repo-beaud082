@@ -22,7 +22,7 @@ uint8_t DunivAddr = 0x04;//Artnet universe address for output D (bits 3:0)
 //////////Network settings/////////////
 byte mac[] = {  
   0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192, 168, 50, 30);
+IPAddress ip(192, 168, 1, 69);
 unsigned int localPort = 6454;      // local port to listen on
 EthernetUDP Udp; // An EthernetUDP instance to let us send and receive packets over UDP
 unsigned char packetBuffer[UDP_TX_PACKET_MAX_SIZE]; //buffer to hold incoming packet,
@@ -84,7 +84,7 @@ void packetRead(){ //reads packet into packet Buffer
   if(packetSize)
   {
     Udp.read(packetBuffer,UDP_TX_PACKET_MAX_SIZE); // read the packet into packetBufffer
-    //packetDump();
+    packetDump();
   }
 }
 void artnetParse(){
@@ -115,10 +115,10 @@ void runOpDmx(){
     Serial.println("ArtDMX Received");
     Serial.print("DMX data length: ");
     Serial.println(DMXLength);
-    /*Serial.print("Artnet Net: ");
+    Serial.print("Artnet Net: ");
     Serial.println((uint8_t) packetBuffer[NET],HEX);
     Serial.print("Artnet SUBUNI: ");
-    Serial.println((uint8_t) packetBuffer[SUBUNI],HEX);*/
+    Serial.println((uint8_t) packetBuffer[SUBUNI],HEX);
     
     if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(AunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output A
       storeDMX(&packetBuffer[DATA], DMXLength, UniverseA);
@@ -129,7 +129,7 @@ void runOpDmx(){
       Serial.println((uint8_t) packetBuffer[SUBUNI],HEX);*/
       //printUniverse(UniverseA);
     }
-    if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(BunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output B
+    else if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(BunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output B
       storeDMX(&packetBuffer[DATA], DMXLength, UniverseB);
       Serial.println("Stored in DMX_B");
       Serial.print("Artnet DMX B SUBUNI: ");
@@ -139,7 +139,7 @@ void runOpDmx(){
       //printUniverse(UniverseB);
       
     }
-    if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(CunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output C
+    else if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(CunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output C
       storeDMX(&packetBuffer[DATA], DMXLength, UniverseC);
       Serial.println("Stored in DMX_C");
       Serial.print("Artnet DMX C SUBUNI: ");
@@ -148,7 +148,7 @@ void runOpDmx(){
       Serial.println((uint8_t) packetBuffer[SUBUNI],HEX);
       //printUniverse(UniverseC);
     }
-    if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(DunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output D
+    else if(packetBuffer[SUBUNI] == ((subnetAddr&0xF0)|(DunivAddr&0x0F))){ //check if ArtDmx data is for the universe assigned to output D
       storeDMX(&packetBuffer[DATA], DMXLength, UniverseD);
       Serial.println("Stored in DMX_D");
       Serial.print("Artnet DMX D SUBUNI: ");
@@ -156,6 +156,10 @@ void runOpDmx(){
       Serial.print("Artnet SUBUNI: ");
       Serial.println((uint8_t) packetBuffer[SUBUNI],HEX);
       //printUniverse(UniverseD);
+    }
+    else {
+      Serial.print("Invalid universe");
+      Serial.println(packetBuffer[SUBUNI]);
     }
   }
 }

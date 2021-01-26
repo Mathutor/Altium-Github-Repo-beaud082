@@ -11,7 +11,7 @@ void setup() {
 }
 
 void loop() {
-  //packetRead();
-  //artnetParse();
+  packetRead();
+  artnetParse();
   // outputTest();
 }
